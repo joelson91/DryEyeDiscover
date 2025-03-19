@@ -5,18 +5,20 @@ st.title("Dry Eye Discover")
 st.write("Este aplicativo consulta a tabela 'participantes' do banco de dados PostgresSQL.")
 
 # Conectar ao banco de dados usando st.connection
-try:
-    conn = st.connection("postgres", type="sql")
+conn = st.connection("postgres", type="sql")
 
-    # Executar a query e armazenar o resultado em um DataFrame
-    df = conn.query('SELECT genero as "Gênero", COUNT(*) as "Contagem" FROM participante GROUP BY genero;')
+# Executar a query e armazenar o resultado em um DataFrame
+df = conn.query(
+    'SELECT participante.genero, AVG(questionario.qualidade_sono) AS media '
+    'FROM participante '
+    'INNER JOIN questionario ON participante.id_participante = questionario.id_participante_id '
+    'GROUP BY participante.genero;'
+)
 
-    # Exibir o DataFrame
-    st.write("### Dados da Tabela 'participantes':")
-    st.dataframe(df)
+# Exibir o DataFrame
+st.write("### Média de qualidade de sono por gênero:")
+st.dataframe(df)
 
-    # Exibir gráfico de barras
-    st.bar_chart(df, x='Gênero', y='Contagem')
-
-except Exception as e:
-    st.error(f"Erro ao conectar ou consultar o banco de dados: {e}")
+# Exibir gráfico de barras
+st.write("### Gráfico de exemplo:")
+st.bar_chart(df, x='genero', y='media')
