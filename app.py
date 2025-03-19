@@ -9,15 +9,14 @@ try:
     conn = st.connection("postgres", type="sql")
 
     # Executar a query e armazenar o resultado em um DataFrame
-    df = conn.query("SELECT * FROM participante")
+    df = conn.query('SELECT genero as "Gênero", COUNT(*) as "Contagem" FROM participante GROUP BY genero;')
 
     # Exibir o DataFrame
     st.write("### Dados da Tabela 'participantes':")
     st.dataframe(df)
 
-    # Exibir informações adicionais sobre o DataFrame
-    st.write(f"Número de linhas: {len(df)}")
-    st.write(f"Colunas: {df.columns.tolist()}")
+    # Exibir gráfico de barras
+    st.bar_chart(df, x='Gênero', y='Contagem')
 
 except Exception as e:
     st.error(f"Erro ao conectar ou consultar o banco de dados: {e}")
